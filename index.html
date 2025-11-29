@@ -1616,6 +1616,7 @@
                     
                     upgradeScreen.style.display = 'none';
                     gamePaused = false;
+                    gameLoop(); // Resume the game loop
                     
                     // Show upgrade message
                     showLevelMessage(`${card.querySelector('.upgrade-title').textContent} ACTIVATED`);
