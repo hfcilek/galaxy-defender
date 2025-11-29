@@ -24,6 +24,7 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
+            touch-action: none;
         }
         
         .player {
@@ -251,6 +252,10 @@
             justify-content: center;
         }
         
+        .mobile-controls-info {
+            display: none;
+        }
+        
         .control-key {
             background-color: rgba(59, 130, 246, 0.2);
             color: white;
@@ -423,55 +428,93 @@
         
         #mobile-controls {
             position: absolute;
-            bottom: 20px;
+            bottom: 30px;
             width: 100%;
             display: none;
             justify-content: space-between;
-            padding: 0 20px;
+            align-items: flex-end;
+            padding: 0 30px;
             z-index: 19;
+            box-sizing: border-box;
+        }
+        
+        .mobile-right-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
         }
         
         .mobile-btn {
-            width: 70px;
-            height: 70px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
-            background-color: rgba(59, 130, 246, 0.3);
-            border: 2px solid #3b82f6;
+            background-color: rgba(59, 130, 246, 0.4);
+            border: 3px solid #3b82f6;
             display: flex;
             justify-content: center;
             align-items: center;
             color: white;
-            font-size: 24px;
+            font-size: 32px;
             user-select: none;
-            touch-action: manipulation;
+            touch-action: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            transition: all 0.1s;
+        }
+        
+        .mobile-btn:active {
+            background-color: rgba(59, 130, 246, 0.7);
+            transform: scale(0.95);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+        }
+        
+        .auto-shoot-btn {
+            width: 60px;
+            height: 60px;
+            font-size: 22px;
+            background-color: rgba(16, 185, 129, 0.5);
+            border-color: #10b981;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+        }
+        
+        .auto-shoot-btn.disabled {
+            background-color: rgba(100, 116, 139, 0.3);
+            border-color: #64748b;
+            box-shadow: 0 0 10px rgba(100, 116, 139, 0.3);
         }
         
         .mobile-joystick {
-            width: 120px;
-            height: 120px;
+            width: 140px;
+            height: 140px;
             position: relative;
-            touch-action: manipulation;
+            touch-action: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
         }
         
         .joystick-base {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background-color: rgba(59, 130, 246, 0.2);
-            border: 2px solid #3b82f6;
+            background-color: rgba(59, 130, 246, 0.25);
+            border: 3px solid #3b82f6;
             position: absolute;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
         }
         
         .joystick-thumb {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            background-color: rgba(59, 130, 246, 0.7);
-            border: 2px solid #3b82f6;
+            background-color: rgba(59, 130, 246, 0.8);
+            border: 3px solid #93c5fd;
             position: absolute;
-            top: 35px;
-            left: 35px;
-            transition: transform 0.1s;
+            top: 40px;
+            left: 40px;
+            transition: transform 0.05s;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
         }
         
         @media (max-width: 768px) {
@@ -479,13 +522,108 @@
                 display: flex;
             }
             
+            .desktop-controls {
+                display: none;
+            }
+            
+            .mobile-controls-info {
+                display: flex;
+            }
+            
             .title {
-                font-size: 48px;
+                font-size: 36px;
+            }
+            
+            .subtitle {
+                font-size: 14px;
             }
             
             .hud-item {
-                padding: 8px 12px;
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+            
+            .health-bar {
+                width: 100px;
+                height: 15px;
+            }
+            
+            .btn {
+                padding: 12px 24px;
                 font-size: 14px;
+            }
+            
+            .controls {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .control-key {
+                font-size: 12px;
+                padding: 8px 12px;
+                min-width: 50px;
+            }
+            
+            .upgrade-card {
+                width: 180px;
+                padding: 15px;
+            }
+            
+            .upgrade-icon {
+                font-size: 28px;
+            }
+            
+            .upgrade-title {
+                font-size: 16px;
+            }
+            
+            .upgrade-desc {
+                font-size: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .title {
+                font-size: 28px;
+                letter-spacing: 2px;
+            }
+            
+            .subtitle {
+                font-size: 12px;
+                padding: 0 20px;
+            }
+            
+            #mobile-controls {
+                bottom: 20px;
+                padding: 0 15px;
+            }
+            
+            .mobile-btn {
+                width: 80px;
+                height: 80px;
+                font-size: 28px;
+            }
+            
+            .mobile-joystick {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .joystick-thumb {
+                width: 50px;
+                height: 50px;
+                top: 35px;
+                left: 35px;
+            }
+            
+            .upgrade-options {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .upgrade-card {
+                width: 90%;
+                max-width: 250px;
             }
         }
     </style>
@@ -523,13 +661,13 @@
                 <i class="fas fa-rocket"></i> START MISSION
             </button>
             
-            <div class="controls">
+            <div class="controls desktop-controls">
                 <div class="flex flex-col items-center">
                     <div class="control-key">WASD</div>
                     <div class="text-blue-200 text-sm mt-2">Move</div>
                 </div>
                 <div class="flex flex-col items-center">
-                    <div class="control-key">SPACE</div>
+                    <div class="control-key">CLICK</div>
                     <div class="text-blue-200 text-sm mt-2">Shoot</div>
                 </div>
                 <div class="flex flex-col items-center">
@@ -539,6 +677,21 @@
                 <div class="flex flex-col items-center">
                     <div class="control-key">P</div>
                     <div class="text-blue-200 text-sm mt-2">Pause</div>
+                </div>
+            </div>
+            
+            <div class="controls mobile-controls-info">
+                <div class="flex flex-col items-center">
+                    <div class="control-key"><i class="fas fa-arrows-alt"></i></div>
+                    <div class="text-blue-200 text-sm mt-2">Joystick</div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="control-key"><i class="fas fa-fire"></i></div>
+                    <div class="text-blue-200 text-sm mt-2">Shoot</div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="control-key"><i class="fas fa-crosshairs"></i></div>
+                    <div class="text-blue-200 text-sm mt-2">Auto Fire</div>
                 </div>
             </div>
         </div>
@@ -592,8 +745,13 @@
                 <div class="joystick-base"></div>
                 <div class="joystick-thumb" id="joystick-thumb"></div>
             </div>
-            <div class="mobile-btn" id="shoot-btn">
-                <i class="fas fa-fire"></i>
+            <div class="mobile-right-controls">
+                <div class="mobile-btn auto-shoot-btn" id="auto-shoot-btn" title="Toggle Auto-Shoot">
+                    <i class="fas fa-crosshairs"></i>
+                </div>
+                <div class="mobile-btn" id="shoot-btn">
+                    <i class="fas fa-fire"></i>
+                </div>
             </div>
         </div>
         
@@ -623,6 +781,7 @@
             const menuBtn = document.getElementById('menu-btn');
             const mobileControls = document.getElementById('mobile-controls');
             const shootBtn = document.getElementById('shoot-btn');
+            const autoShootBtn = document.getElementById('auto-shoot-btn');
             const joystick = document.getElementById('joystick');
             const joystickThumb = document.getElementById('joystick-thumb');
             
@@ -689,11 +848,17 @@
             let joystickStartY = 0;
             let joystickX = 0;
             let joystickY = 0;
+            let mobileShootActive = false;
+            let mobileShootInterval = null;
+            let autoShootEnabled = true; // Auto-shoot is enabled by default on mobile
             
             // Check if mobile device
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                            ('ontouchstart' in window) || 
+                            (navigator.maxTouchPoints > 0);
             if (isMobile) {
                 mobileControls.style.display = 'flex';
+                document.body.style.touchAction = 'none';
             }
             
             // Initialize high score display
@@ -950,11 +1115,19 @@
                 const bullet = document.createElement('div');
                 bullet.className = 'bullet';
                 
-                // Calculate direction towards mouse
-                const angle = Math.atan2(mouseY - (playerY + 30), mouseX - (playerX + 30));
-                const speed = 10;
-                const velX = Math.cos(angle) * speed;
-                const velY = Math.sin(angle) * speed;
+                // Calculate direction - on mobile aim upwards, on desktop towards mouse
+                let velX, velY;
+                if (isMobile) {
+                    // On mobile, shoot straight up
+                    velX = 0;
+                    velY = -10;
+                } else {
+                    // On desktop, aim towards mouse
+                    const angle = Math.atan2(mouseY - (playerY + 30), mouseX - (playerX + 30));
+                    const speed = 10;
+                    velX = Math.cos(angle) * speed;
+                    velY = Math.sin(angle) * speed;
+                }
                 
                 bullet.style.left = `${playerX + 26}px`;
                 bullet.style.top = `${playerY + 30}px`;
@@ -982,7 +1155,8 @@
             const fireRate = 300; // milliseconds between shots
             
             function handleAutoShoot() {
-                if (gameRunning && !gamePaused) {
+                // Only auto-shoot on mobile when auto-shoot is enabled
+                if (gameRunning && !gamePaused && isMobile && autoShootEnabled) {
                     const now = Date.now();
                     if (now - lastShotTime > fireRate) {
                         shoot();
@@ -1121,6 +1295,46 @@
                 
                 // Flash player blue
                 player.style.filter = 'brightness(1.5)';
+            }
+            
+            // Update ship visual based on upgrades
+            function updateShipVisual() {
+                let shipColor = '%233b82f6'; // Base blue
+                let glowColor = '%2393c5fd';
+                let shipSize = 60;
+                
+                // Change color based on damage upgrades
+                if (upgrades.damage >= 3.375) { // 1.5^3
+                    shipColor = '%23ef4444'; // Red for high damage
+                    glowColor = '%23fca5a5';
+                } else if (upgrades.damage >= 2.25) { // 1.5^2
+                    shipColor = '%23f59e0b'; // Orange for medium damage
+                    glowColor = '%23fcd34d';
+                } else if (upgrades.damage >= 1.5) {
+                    shipColor = '%2310b981'; // Green for first damage upgrade
+                    glowColor = '%2334d399';
+                }
+                
+                // Increase ship size slightly with speed upgrades
+                if (upgrades.speed >= 1.3) {
+                    shipSize = 65;
+                }
+                if (upgrades.speed >= 1.69) { // 1.3^2
+                    shipSize = 70;
+                }
+                
+                // Update ship appearance
+                player.style.width = `${shipSize}px`;
+                player.style.height = `${shipSize}px`;
+                player.style.backgroundImage = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="${shipColor}" d="M12 2L4 12l8 10 8-10z"/><circle cx="12" cy="12" r="4" fill="${glowColor}"/></svg>')`;
+                
+                // Add glow effect based on total upgrades (using logarithmic calculation for stacking)
+                const damageUpgrades = upgrades.damage > 1 ? Math.log(upgrades.damage) / Math.log(1.5) : 0;
+                const speedUpgrades = upgrades.speed > 1 ? Math.log(upgrades.speed) / Math.log(1.3) : 0;
+                const totalUpgrades = damageUpgrades + speedUpgrades;
+                if (totalUpgrades > 0) {
+                    player.style.filter = `drop-shadow(0 0 ${10 + totalUpgrades * 3}px ${shipColor.replace('%23', '#')})`;
+                }
             }
             
             // Check shield status
@@ -1372,14 +1586,19 @@
                     const upgrade = card.dataset.upgrade;
                     
                     if (upgrade === 'damage') {
-                        upgrades.damage = 1.5;
+                        // Stack damage upgrades - multiply by 1.5 each time
+                        upgrades.damage *= 1.5;
                     } else if (upgrade === 'speed') {
-                        playerSpeed = basePlayerSpeed * 1.3;
-                        upgrades.speed = 1.3;
+                        // Stack speed upgrades - multiply by 1.3 each time
+                        upgrades.speed *= 1.3;
+                        playerSpeed = basePlayerSpeed * upgrades.speed;
                     } else if (upgrade === 'shield') {
                         upgrades.shield = true;
                         activateShield();
                     }
+                    
+                    // Update ship visual based on upgrades
+                    updateShipVisual();
                     
                     upgradeScreen.style.display = 'none';
                     gamePaused = false;
@@ -1422,17 +1641,68 @@
                 }
             });
             
-            // Touch controls for mobile
+            // Touch controls for mobile - continuous fire
             shootBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 if (gameRunning && !gamePaused) {
-                    shoot();
+                    mobileShootActive = true;
+                    shoot(); // Fire immediately
+                    // Start continuous firing
+                    mobileShootInterval = setInterval(() => {
+                        if (gameRunning && !gamePaused && mobileShootActive) {
+                            shoot();
+                        }
+                    }, fireRate);
+                }
+            });
+            
+            shootBtn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                mobileShootActive = false;
+                if (mobileShootInterval) {
+                    clearInterval(mobileShootInterval);
+                    mobileShootInterval = null;
+                }
+            });
+            
+            shootBtn.addEventListener('touchcancel', (e) => {
+                e.preventDefault();
+                mobileShootActive = false;
+                if (mobileShootInterval) {
+                    clearInterval(mobileShootInterval);
+                    mobileShootInterval = null;
+                }
+            });
+            
+            // Auto-shoot toggle button
+            autoShootBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                autoShootEnabled = !autoShootEnabled;
+                if (autoShootEnabled) {
+                    autoShootBtn.classList.remove('disabled');
+                } else {
+                    autoShootBtn.classList.add('disabled');
+                }
+            });
+            
+            autoShootBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                autoShootEnabled = !autoShootEnabled;
+                if (autoShootEnabled) {
+                    autoShootBtn.classList.remove('disabled');
+                } else {
+                    autoShootBtn.classList.add('disabled');
                 }
             });
             
             // Joystick for mobile
             joystick.addEventListener('touchstart', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 const touch = e.touches[0];
                 const rect = joystick.getBoundingClientRect();
                 joystickStartX = rect.left + rect.width / 2;
@@ -1441,19 +1711,44 @@
                 updateJoystick(touch.clientX, touch.clientY);
             });
             
-            document.addEventListener('touchmove', (e) => {
-                if (joystickActive) {
+            joystick.addEventListener('touchmove', (e) => {
+                if (joystickActive && e.touches.length > 0) {
                     e.preventDefault();
+                    e.stopPropagation();
                     const touch = e.touches[0];
                     updateJoystick(touch.clientX, touch.clientY);
                 }
             });
             
-            document.addEventListener('touchend', () => {
+            joystick.addEventListener('touchend', (e) => {
+                e.preventDefault();
                 joystickActive = false;
                 joystickX = 0;
                 joystickY = 0;
                 joystickThumb.style.transform = 'translate(0, 0)';
+            });
+            
+            joystick.addEventListener('touchcancel', (e) => {
+                e.preventDefault();
+                joystickActive = false;
+                joystickX = 0;
+                joystickY = 0;
+                joystickThumb.style.transform = 'translate(0, 0)';
+            });
+            
+            document.addEventListener('touchend', (e) => {
+                // Only reset joystick if touch ended outside joystick area
+                if (joystickActive && e.changedTouches.length > 0) {
+                    const touch = e.changedTouches[0];
+                    const rect = joystick.getBoundingClientRect();
+                    if (touch.clientX < rect.left || touch.clientX > rect.right ||
+                        touch.clientY < rect.top || touch.clientY > rect.bottom) {
+                        joystickActive = false;
+                        joystickX = 0;
+                        joystickY = 0;
+                        joystickThumb.style.transform = 'translate(0, 0)';
+                    }
+                }
             });
             
             function updateJoystick(touchX, touchY) {
