@@ -1167,7 +1167,8 @@
             
             // Move bullets
             function moveBullets() {
-                bullets.forEach((bullet, index) => {
+                for (let i = bullets.length - 1; i >= 0; i--) {
+                    const bullet = bullets[i];
                     bullet.x += bullet.velX;
                     bullet.y += bullet.velY;
                     bullet.element.style.left = `${bullet.x}px`;
@@ -1176,9 +1177,9 @@
                     // Remove bullets that are off screen
                     if (bullet.x < 0 || bullet.x > gameAreaWidth || bullet.y < 0 || bullet.y > gameAreaHeight) {
                         gameContainer.removeChild(bullet.element);
-                        bullets.splice(index, 1);
+                        bullets.splice(i, 1);
                     }
-                });
+                }
             }
             
             // Move enemies
@@ -1194,7 +1195,8 @@
                     }
                 }
                 
-                enemies.forEach((enemy, index) => {
+                for (let i = enemies.length - 1; i >= 0; i--) {
+                    const enemy = enemies[i];
                     enemy.y += enemy.speed;
                     enemy.element.style.top = `${enemy.y}px`;
                     
@@ -1210,25 +1212,26 @@
                         }
                         createExplosion(enemy.x + enemy.size/2, enemy.y + enemy.size/2, enemy.type === 'boss' ? 2 : 1);
                         gameContainer.removeChild(enemy.element);
-                        enemies.splice(index, 1);
+                        enemies.splice(i, 1);
                         
                         if (enemy.type === 'boss') {
                             bossActive = false;
                             bossHealthBar.style.display = 'none';
                         }
+                        continue;
                     }
                     
                     // Remove enemies that are off screen
                     if (enemy.y > gameAreaHeight) {
                         gameContainer.removeChild(enemy.element);
-                        enemies.splice(index, 1);
+                        enemies.splice(i, 1);
                         
                         if (enemy.type === 'boss') {
                             bossActive = false;
                             bossHealthBar.style.display = 'none';
                         }
                     }
-                });
+                }
             }
             
             // Move powerups
@@ -1239,7 +1242,8 @@
                     lastPowerupTime = currentTime;
                 }
                 
-                powerups.forEach((powerup, index) => {
+                for (let i = powerups.length - 1; i >= 0; i--) {
+                    const powerup = powerups[i];
                     powerup.y += powerup.speed;
                     powerup.element.style.top = `${powerup.y}px`;
                     
@@ -1267,15 +1271,16 @@
                         }
                         
                         gameContainer.removeChild(powerup.element);
-                        powerups.splice(index, 1);
+                        powerups.splice(i, 1);
+                        continue;
                     }
                     
                     // Remove powerups that are off screen
                     if (powerup.y > gameAreaHeight) {
                         gameContainer.removeChild(powerup.element);
-                        powerups.splice(index, 1);
+                        powerups.splice(i, 1);
                     }
-                });
+                }
             }
             
             // Activate shield
@@ -1359,8 +1364,16 @@
             
             // Check bullet-enemy collisions
             function checkCollisions() {
-                bullets.forEach((bullet, bulletIndex) => {
-                    enemies.forEach((enemy, enemyIndex) => {
+                for (let bulletIndex = bullets.length - 1; bulletIndex >= 0; bulletIndex--) {
+                    const bullet = bullets[bulletIndex];
+                    if (!bullet) continue;
+                    
+                    let bulletRemoved = false;
+                    
+                    for (let enemyIndex = enemies.length - 1; enemyIndex >= 0; enemyIndex--) {
+                        const enemy = enemies[enemyIndex];
+                        if (!enemy || bulletRemoved) continue;
+                        
                         if (
                             bullet.y < enemy.y + enemy.size &&
                             bullet.y + 24 > enemy.y &&
@@ -1420,9 +1433,10 @@
                             // Remove bullet
                             gameContainer.removeChild(bullet.element);
                             bullets.splice(bulletIndex, 1);
+                            bulletRemoved = true;
                         }
-                    });
-                });
+                    }
+                }
             }
             
             // Check level progression
