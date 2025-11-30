@@ -60,6 +60,82 @@
             filter: drop-shadow(0 0 5px #ef4444);
         }
         
+        .enemy-scout {
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%2322c55e" d="M12 2L6 12l6 10 6-10z"/><circle cx="12" cy="10" r="3" fill="%2386efac"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 8;
+            filter: drop-shadow(0 0 5px #22c55e);
+        }
+        
+        .enemy-tank {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" fill="%23f97316"/><circle cx="12" cy="12" r="5" fill="%23fdba74"/><rect x="10" y="2" width="4" height="4" fill="%23f97316"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 8;
+            filter: drop-shadow(0 0 8px #f97316);
+        }
+        
+        .enemy-zigzag {
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23eab308" d="M2 12l5-5 5 5 5-5 5 5v4l-5-5-5 5-5-5-5 5z"/><circle cx="12" cy="14" r="4" fill="%23fef08a"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 8;
+            filter: drop-shadow(0 0 5px #eab308);
+        }
+        
+        .enemy-shooter {
+            position: absolute;
+            width: 55px;
+            height: 55px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%238b5cf6" d="M12 2L4 10v8l8 4 8-4v-8z"/><circle cx="12" cy="12" r="4" fill="%23c4b5fd"/><rect x="10" y="16" width="4" height="6" fill="%238b5cf6"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 8;
+            filter: drop-shadow(0 0 6px #8b5cf6);
+        }
+        
+        .enemy-splitter {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="%23ec4899"/><circle cx="8" cy="10" r="3" fill="%23f9a8d4"/><circle cx="16" cy="10" r="3" fill="%23f9a8d4"/><circle cx="12" cy="16" r="3" fill="%23f9a8d4"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 8;
+            filter: drop-shadow(0 0 6px #ec4899);
+        }
+        
+        .enemy-mini {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="%23ec4899"/><circle cx="12" cy="12" r="4" fill="%23f9a8d4"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 8;
+            filter: drop-shadow(0 0 4px #ec4899);
+        }
+        
+        .enemy-bullet {
+            position: absolute;
+            width: 6px;
+            height: 18px;
+            background: linear-gradient(to bottom, #8b5cf6, #c4b5fd);
+            border-radius: 3px;
+            box-shadow: 0 0 10px #8b5cf6;
+            z-index: 5;
+        }
+        
         .boss {
             position: absolute;
             width: 100px;
@@ -645,6 +721,9 @@
                 <i class="fas fa-bolt"></i>
                 <span id="level-display">1</span>
             </div>
+            <div class="hud-item sound-toggle" id="sound-toggle" style="pointer-events: auto; cursor: pointer;">
+                <i class="fas fa-volume-up" id="sound-icon"></i>
+            </div>
         </div>
         
         <div id="level-display-animation"></div>
@@ -760,7 +839,146 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Game elements
+            // ==================== SOUND SYSTEM ====================
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            let audioCtx = null;
+            let soundEnabled = true;
+            
+            function initAudio() {
+                if (!audioCtx) {
+                    audioCtx = new AudioContext();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            }
+            
+            // Sound effect generator using Web Audio API
+            function playSound(type) {
+                if (!soundEnabled || !audioCtx) return;
+                
+                try {
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    
+                    const now = audioCtx.currentTime;
+                    
+                    switch(type) {
+                        case 'shoot':
+                            oscillator.type = 'square';
+                            oscillator.frequency.setValueAtTime(600, now);
+                            oscillator.frequency.exponentialRampToValueAtTime(200, now + 0.1);
+                            gainNode.gain.setValueAtTime(0.1, now);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                            oscillator.start(now);
+                            oscillator.stop(now + 0.1);
+                            break;
+                            
+                        case 'explosion':
+                            oscillator.type = 'sawtooth';
+                            oscillator.frequency.setValueAtTime(150, now);
+                            oscillator.frequency.exponentialRampToValueAtTime(20, now + 0.3);
+                            gainNode.gain.setValueAtTime(0.2, now);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                            oscillator.start(now);
+                            oscillator.stop(now + 0.3);
+                            break;
+                            
+                        case 'explosion_big':
+                            oscillator.type = 'sawtooth';
+                            oscillator.frequency.setValueAtTime(100, now);
+                            oscillator.frequency.exponentialRampToValueAtTime(10, now + 0.5);
+                            gainNode.gain.setValueAtTime(0.3, now);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                            oscillator.start(now);
+                            oscillator.stop(now + 0.5);
+                            break;
+                            
+                        case 'powerup':
+                            oscillator.type = 'sine';
+                            oscillator.frequency.setValueAtTime(400, now);
+                            oscillator.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+                            oscillator.frequency.exponentialRampToValueAtTime(1200, now + 0.2);
+                            gainNode.gain.setValueAtTime(0.15, now);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                            oscillator.start(now);
+                            oscillator.stop(now + 0.3);
+                            break;
+                            
+                        case 'damage':
+                            oscillator.type = 'square';
+                            oscillator.frequency.setValueAtTime(200, now);
+                            oscillator.frequency.exponentialRampToValueAtTime(80, now + 0.2);
+                            gainNode.gain.setValueAtTime(0.2, now);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                            oscillator.start(now);
+                            oscillator.stop(now + 0.2);
+                            break;
+                            
+                        case 'levelup':
+                            oscillator.type = 'sine';
+                            oscillator.frequency.setValueAtTime(523, now); // C5
+                            oscillator.frequency.setValueAtTime(659, now + 0.1); // E5
+                            oscillator.frequency.setValueAtTime(784, now + 0.2); // G5
+                            oscillator.frequency.setValueAtTime(1047, now + 0.3); // C6
+                            gainNode.gain.setValueAtTime(0.15, now);
+                            gainNode.gain.setValueAtTime(0.15, now + 0.3);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                            oscillator.start(now);
+                            oscillator.stop(now + 0.5);
+                            break;
+                            
+                        case 'gameover':
+                            oscillator.type = 'sawtooth';
+                            oscillator.frequency.setValueAtTime(400, now);
+                            oscillator.frequency.exponentialRampToValueAtTime(100, now + 0.5);
+                            oscillator.frequency.exponentialRampToValueAtTime(50, now + 1);
+                            gainNode.gain.setValueAtTime(0.2, now);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 1);
+                            oscillator.start(now);
+                            oscillator.stop(now + 1);
+                            break;
+                            
+                        case 'boss_warning':
+                            oscillator.type = 'square';
+                            oscillator.frequency.setValueAtTime(150, now);
+                            oscillator.frequency.setValueAtTime(100, now + 0.2);
+                            oscillator.frequency.setValueAtTime(150, now + 0.4);
+                            oscillator.frequency.setValueAtTime(100, now + 0.6);
+                            gainNode.gain.setValueAtTime(0.15, now);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+                            oscillator.start(now);
+                            oscillator.stop(now + 0.8);
+                            break;
+                            
+                        case 'enemy_shoot':
+                            oscillator.type = 'triangle';
+                            oscillator.frequency.setValueAtTime(300, now);
+                            oscillator.frequency.exponentialRampToValueAtTime(150, now + 0.1);
+                            gainNode.gain.setValueAtTime(0.08, now);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                            oscillator.start(now);
+                            oscillator.stop(now + 0.1);
+                            break;
+                            
+                        case 'combo':
+                            oscillator.type = 'sine';
+                            oscillator.frequency.setValueAtTime(800, now);
+                            oscillator.frequency.exponentialRampToValueAtTime(1600, now + 0.15);
+                            gainNode.gain.setValueAtTime(0.12, now);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                            oscillator.start(now);
+                            oscillator.stop(now + 0.2);
+                            break;
+                    }
+                } catch(e) {
+                    console.log('Sound error:', e);
+                }
+            }
+            
+            // ==================== GAME ELEMENTS ====================
             const gameContainer = document.getElementById('game-container');
             const player = document.getElementById('player');
             const scoreDisplay = document.getElementById('score-display');
@@ -804,6 +1022,7 @@
             let playerSpeed = 5;
             let bullets = [];
             let enemies = [];
+            let enemyBullets = [];
             let explosions = [];
             let stars = [];
             let powerups = [];
@@ -911,35 +1130,135 @@
                 });
             }
             
-            // Create enemy
+            // Create enemy - now with different types
             function createEnemy() {
-                const enemyType = Math.random() > 0.9 && level > 3 ? 'boss' : 'normal';
-                
-                if (enemyType === 'boss' && !bossActive) {
+                // Check for boss spawn
+                if (Math.random() > 0.92 && level > 3 && !bossActive) {
                     createBoss();
                     return;
                 }
                 
-                const enemy = document.createElement('div');
-                enemy.className = enemyType === 'boss' ? 'boss' : 'enemy';
+                // Determine enemy type based on level and randomness
+                let enemyType = 'normal';
+                const roll = Math.random();
                 
-                const left = Math.random() * (gameAreaWidth - (enemyType === 'boss' ? 100 : 50));
-                const speed = Math.random() * 2 + 1 + (level * 0.2);
+                if (level >= 2) {
+                    if (roll < 0.2) {
+                        enemyType = 'scout'; // Fast but weak
+                    } else if (roll < 0.35 && level >= 3) {
+                        enemyType = 'tank'; // Slow but strong
+                    } else if (roll < 0.5 && level >= 4) {
+                        enemyType = 'zigzag'; // Zigzag movement
+                    } else if (roll < 0.65 && level >= 5) {
+                        enemyType = 'shooter'; // Shoots back
+                    } else if (roll < 0.75 && level >= 6) {
+                        enemyType = 'splitter'; // Splits when destroyed
+                    }
+                }
+                
+                const enemy = document.createElement('div');
+                let size, speed, health, points, className;
+                
+                switch(enemyType) {
+                    case 'scout':
+                        className = 'enemy-scout';
+                        size = 35;
+                        speed = Math.random() * 3 + 3 + (level * 0.2);
+                        health = 1;
+                        points = 15;
+                        break;
+                    case 'tank':
+                        className = 'enemy-tank';
+                        size = 70;
+                        speed = Math.random() * 1 + 0.5 + (level * 0.1);
+                        health = 5 + Math.floor(level / 2);
+                        points = 30;
+                        break;
+                    case 'zigzag':
+                        className = 'enemy-zigzag';
+                        size = 45;
+                        speed = Math.random() * 2 + 2 + (level * 0.15);
+                        health = 2;
+                        points = 20;
+                        break;
+                    case 'shooter':
+                        className = 'enemy-shooter';
+                        size = 55;
+                        speed = Math.random() * 1.5 + 1 + (level * 0.1);
+                        health = 3;
+                        points = 25;
+                        break;
+                    case 'splitter':
+                        className = 'enemy-splitter';
+                        size = 60;
+                        speed = Math.random() * 1.5 + 1 + (level * 0.1);
+                        health = 4;
+                        points = 35;
+                        break;
+                    default: // normal
+                        className = 'enemy';
+                        size = 50;
+                        speed = Math.random() * 2 + 1 + (level * 0.2);
+                        health = 2;
+                        points = 10;
+                }
+                
+                enemy.className = className;
+                
+                const left = Math.random() * (gameAreaWidth - size);
                 
                 enemy.style.left = `${left}px`;
-                enemy.style.top = enemyType === 'boss' ? '-100px' : '-50px';
+                enemy.style.top = `-${size}px`;
+                
+                gameContainer.appendChild(enemy);
+                
+                const enemyObj = {
+                    element: enemy,
+                    x: left,
+                    y: -size,
+                    speed: speed,
+                    health: health,
+                    maxHealth: health,
+                    size: size,
+                    type: enemyType,
+                    points: points,
+                    zigzagPhase: Math.random() * Math.PI * 2,
+                    zigzagAmplitude: 3,
+                    lastShootTime: 0,
+                    shootInterval: 2000 + Math.random() * 1000
+                };
+                
+                enemies.push(enemyObj);
+            }
+            
+            // Create mini enemy (from splitter)
+            function createMiniEnemy(x, y) {
+                const enemy = document.createElement('div');
+                enemy.className = 'enemy-mini';
+                
+                const size = 25;
+                const offsetX = (Math.random() - 0.5) * 50;
+                const offsetY = (Math.random() - 0.5) * 30;
+                
+                enemy.style.left = `${x + offsetX}px`;
+                enemy.style.top = `${y + offsetY}px`;
                 
                 gameContainer.appendChild(enemy);
                 
                 enemies.push({
                     element: enemy,
-                    x: left,
-                    y: enemyType === 'boss' ? -100 : -50,
-                    speed: speed,
-                    health: enemyType === 'boss' ? 10 : 2,
-                    size: enemyType === 'boss' ? 100 : 50,
-                    type: enemyType,
-                    points: enemyType === 'boss' ? 50 : 10
+                    x: x + offsetX,
+                    y: y + offsetY,
+                    speed: Math.random() * 2 + 2.5,
+                    health: 1,
+                    maxHealth: 1,
+                    size: size,
+                    type: 'mini',
+                    points: 5,
+                    zigzagPhase: 0,
+                    zigzagAmplitude: 0,
+                    lastShootTime: 0,
+                    shootInterval: 99999 // Mini enemies don't shoot
                 });
             }
             
@@ -948,6 +1267,8 @@
                 bossActive = true;
                 bossMaxHealth = 100 + (level * 50);
                 bossHealth = bossMaxHealth;
+                
+                playSound('boss_warning');
                 
                 const boss = document.createElement('div');
                 boss.className = 'boss';
@@ -965,9 +1286,14 @@
                     y: -100,
                     speed: 1.5,
                     health: bossHealth,
+                    maxHealth: bossMaxHealth,
                     size: 100,
                     type: 'boss',
-                    points: 100
+                    points: 100,
+                    zigzagPhase: 0,
+                    zigzagAmplitude: 0,
+                    lastShootTime: 0,
+                    shootInterval: 1500
                 });
                 
                 // Show boss health bar
@@ -1010,7 +1336,7 @@
             }
             
             // Create explosion
-            function createExplosion(x, y, size = 1) {
+            function createExplosion(x, y, size = 1, withSound = true) {
                 const explosion = document.createElement('div');
                 explosion.className = 'explosion';
                 
@@ -1024,6 +1350,15 @@
                     element: explosion,
                     time: Date.now()
                 });
+                
+                // Play explosion sound
+                if (withSound) {
+                    if (size >= 2) {
+                        playSound('explosion_big');
+                    } else {
+                        playSound('explosion');
+                    }
+                }
                 
                 // Remove explosion after animation
                 setTimeout(() => {
@@ -1053,6 +1388,8 @@
             // Show combo
             function showCombo() {
                 if (comboCount < 3) return;
+                
+                playSound('combo');
                 
                 const comboElement = document.createElement('div');
                 comboElement.className = 'combo-display';
@@ -1111,6 +1448,8 @@
             // Shoot bullet
             function shoot() {
                 if (!gameRunning || gamePaused) return;
+                
+                playSound('shoot');
                 
                 const bullet = document.createElement('div');
                 bullet.className = 'bullet';
@@ -1198,6 +1537,23 @@
                 for (let i = enemies.length - 1; i >= 0; i--) {
                     const enemy = enemies[i];
                     enemy.y += enemy.speed;
+                    
+                    // Zigzag movement for zigzag enemies
+                    if (enemy.type === 'zigzag') {
+                        enemy.zigzagPhase += 0.1;
+                        enemy.x += Math.sin(enemy.zigzagPhase) * enemy.zigzagAmplitude;
+                        enemy.x = Math.max(0, Math.min(gameAreaWidth - enemy.size, enemy.x));
+                        enemy.element.style.left = `${enemy.x}px`;
+                    }
+                    
+                    // Shooter enemies shoot at player
+                    if ((enemy.type === 'shooter' || enemy.type === 'boss') && enemy.y > 50 && enemy.y < gameAreaHeight - 100) {
+                        if (currentTime - enemy.lastShootTime > enemy.shootInterval) {
+                            enemyShoot(enemy);
+                            enemy.lastShootTime = currentTime;
+                        }
+                    }
+                    
                     enemy.element.style.top = `${enemy.y}px`;
                     
                     // Check collision with player
@@ -1208,7 +1564,8 @@
                         enemy.x < playerX + 60
                     ) {
                         if (!upgrades.shieldActive) {
-                            takeDamage(enemy.type === 'boss' ? 20 : 10);
+                            const damage = enemy.type === 'boss' ? 20 : enemy.type === 'tank' ? 15 : 10;
+                            takeDamage(damage);
                         }
                         createExplosion(enemy.x + enemy.size/2, enemy.y + enemy.size/2, enemy.type === 'boss' ? 2 : 1);
                         gameContainer.removeChild(enemy.element);
@@ -1234,6 +1591,65 @@
                 }
             }
             
+            // Enemy shoots at player
+            function enemyShoot(enemy) {
+                playSound('enemy_shoot');
+                
+                const bullet = document.createElement('div');
+                bullet.className = 'enemy-bullet';
+                
+                // Calculate direction towards player
+                const startX = enemy.x + enemy.size / 2;
+                const startY = enemy.y + enemy.size;
+                const angle = Math.atan2(playerY - startY, (playerX + 30) - startX);
+                const speed = 5;
+                
+                bullet.style.left = `${startX - 3}px`;
+                bullet.style.top = `${startY}px`;
+                
+                gameContainer.appendChild(bullet);
+                
+                enemyBullets.push({
+                    element: bullet,
+                    x: startX - 3,
+                    y: startY,
+                    velX: Math.cos(angle) * speed,
+                    velY: Math.sin(angle) * speed
+                });
+            }
+            
+            // Move enemy bullets
+            function moveEnemyBullets() {
+                for (let i = enemyBullets.length - 1; i >= 0; i--) {
+                    const bullet = enemyBullets[i];
+                    bullet.x += bullet.velX;
+                    bullet.y += bullet.velY;
+                    bullet.element.style.left = `${bullet.x}px`;
+                    bullet.element.style.top = `${bullet.y}px`;
+                    
+                    // Check collision with player
+                    if (
+                        bullet.x + 6 > playerX &&
+                        bullet.x < playerX + 60 &&
+                        bullet.y + 18 > playerY &&
+                        bullet.y < playerY + 60
+                    ) {
+                        if (!upgrades.shieldActive) {
+                            takeDamage(10);
+                        }
+                        gameContainer.removeChild(bullet.element);
+                        enemyBullets.splice(i, 1);
+                        continue;
+                    }
+                    
+                    // Remove bullets that are off screen
+                    if (bullet.x < 0 || bullet.x > gameAreaWidth || bullet.y < 0 || bullet.y > gameAreaHeight) {
+                        gameContainer.removeChild(bullet.element);
+                        enemyBullets.splice(i, 1);
+                    }
+                }
+            }
+            
             // Move powerups
             function movePowerups() {
                 const currentTime = Date.now();
@@ -1254,20 +1670,22 @@
                         powerup.x + 40 > playerX &&
                         powerup.x < playerX + 60
                     ) {
+                        playSound('powerup');
+                        
                         if (powerup.type === 'health') {
                             health = Math.min(maxHealth, health + 20);
                             healthDisplay.style.width = `${(health/maxHealth)*100}%`;
-                            createExplosion(powerup.x + 20, powerup.y + 20, 0.8);
+                            createExplosion(powerup.x + 20, powerup.y + 20, 0.8, false);
                         } else if (powerup.type === 'double') {
                             // Double points for 5 seconds
                             comboMultiplier = 2;
                             setTimeout(() => {
                                 comboMultiplier = 1;
                             }, 5000);
-                            createExplosion(powerup.x + 20, powerup.y + 20, 0.8);
+                            createExplosion(powerup.x + 20, powerup.y + 20, 0.8, false);
                         } else if (powerup.type === 'shield') {
                             activateShield();
-                            createExplosion(powerup.x + 20, powerup.y + 20, 0.8);
+                            createExplosion(powerup.x + 20, powerup.y + 20, 0.8, false);
                         }
                         
                         gameContainer.removeChild(powerup.element);
@@ -1412,10 +1830,17 @@
                                 // Count enemies defeated for level progression
                                 enemiesDefeated++;
                                 
+                                // Handle splitter enemy - spawn mini enemies
+                                if (enemy.type === 'splitter') {
+                                    for (let j = 0; j < 3; j++) {
+                                        createMiniEnemy(enemy.x + enemy.size/2, enemy.y + enemy.size/2);
+                                    }
+                                }
+                                
                                 createExplosion(
                                     enemy.x + enemy.size/2, 
                                     enemy.y + enemy.size/2, 
-                                    enemy.type === 'boss' ? 2 : 1
+                                    enemy.type === 'boss' ? 2 : enemy.type === 'tank' ? 1.5 : 1
                                 );
                                 
                                 gameContainer.removeChild(enemy.element);
@@ -1452,6 +1877,8 @@
                 enemiesDefeated = 0;
                 enemiesToNextLevel = 10 + (level * 2);
                 
+                playSound('levelup');
+                
                 // Show level up message
                 showLevelMessage(`LEVEL ${level}`);
                 levelDisplay.textContent = level;
@@ -1471,6 +1898,8 @@
             // Player takes damage
             function takeDamage(amount) {
                 if (upgrades.shieldActive) return;
+                
+                playSound('damage');
                 
                 health -= amount;
                 healthDisplay.style.width = `${(health/maxHealth)*100}%`;
@@ -1493,6 +1922,7 @@
                 
                 movePlayer();
                 moveBullets();
+                moveEnemyBullets();
                 moveEnemies();
                 movePowerups();
                 moveStars();
@@ -1506,6 +1936,9 @@
             
             // Start game
             function startGame() {
+                // Initialize audio context on user interaction
+                initAudio();
+                
                 // Reset game state
                 score = 0;
                 health = 100;
@@ -1522,6 +1955,7 @@
                 player.style.top = `${playerY}px`;
                 bullets = [];
                 enemies = [];
+                enemyBullets = [];
                 powerups = [];
                 enemyFrequency = 1500;
                 playerSpeed = basePlayerSpeed;
@@ -1538,8 +1972,10 @@
                 };
                 
                 // Clear existing elements
-                document.querySelectorAll('.bullet, .enemy, .explosion, .powerup, .shield').forEach(el => {
-                    gameContainer.removeChild(el);
+                document.querySelectorAll('.bullet, .enemy, .enemy-scout, .enemy-tank, .enemy-zigzag, .enemy-shooter, .enemy-splitter, .enemy-mini, .enemy-bullet, .boss, .explosion, .powerup, .shield').forEach(el => {
+                    if (el.parentNode) {
+                        gameContainer.removeChild(el);
+                    }
                 });
                 
                 // Hide screens
@@ -1559,6 +1995,8 @@
             function gameOver() {
                 gameRunning = false;
                 cancelAnimationFrame(animationId);
+                
+                playSound('gameover');
                 
                 // Update high score
                 if (score > highScore) {
@@ -1592,6 +2030,18 @@
             menuBtn.addEventListener('click', () => {
                 gameOverScreen.style.display = 'none';
                 startScreen.style.display = 'flex';
+            });
+            
+            // Sound toggle
+            const soundToggle = document.getElementById('sound-toggle');
+            const soundIcon = document.getElementById('sound-icon');
+            soundToggle.addEventListener('click', () => {
+                soundEnabled = !soundEnabled;
+                if (soundEnabled) {
+                    soundIcon.className = 'fas fa-volume-up';
+                } else {
+                    soundIcon.className = 'fas fa-volume-mute';
+                }
             });
             
             // Upgrade selection
