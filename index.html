@@ -920,9 +920,9 @@
                         case 'levelup':
                             oscillator.type = 'sine';
                             oscillator.frequency.setValueAtTime(523, now); // C5
-                            oscillator.frequency.setValueAtTime(659, now + 0.1); // E5
-                            oscillator.frequency.setValueAtTime(784, now + 0.2); // G5
-                            oscillator.frequency.setValueAtTime(1047, now + 0.3); // C6
+                            oscillator.frequency.linearRampToValueAtTime(659, now + 0.1); // E5
+                            oscillator.frequency.linearRampToValueAtTime(784, now + 0.2); // G5
+                            oscillator.frequency.linearRampToValueAtTime(1047, now + 0.3); // C6
                             gainNode.gain.setValueAtTime(0.15, now);
                             gainNode.gain.setValueAtTime(0.15, now + 0.3);
                             gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
